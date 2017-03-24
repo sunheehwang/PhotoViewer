@@ -1,7 +1,6 @@
 package com.happy.photoviewer.main;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,20 +11,14 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.happy.photoviewer.R;
-import com.happy.photoviewer.main.network.APIService;
+import com.happy.photoviewer.main.list_images.ListImagesContract;
+import com.happy.photoviewer.main.list_images.ListImagesPresenter;
 
-import com.happy.photoviewer.main.network.ImageModel;
 import com.happy.photoviewer.main.network.PhotoModel;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  implements ListImagesContract.View {
 
   private String TAG = MainActivity.class.getSimpleName();
 
@@ -33,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
   RecyclerView mRecyclerView;
 
   private  RecyclerViewAdapter mPhotoViewAdapter;
+  private ListImagesContract.Presenter mPresenter;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -41,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     Log.d(TAG, "state = onCreate");
 
+    mPresenter = new ListImagesPresenter(this);
 
     LinearLayoutManager layoutManager = new LinearLayoutManager(this);
     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -50,40 +45,13 @@ public class MainActivity extends AppCompatActivity {
     mPhotoViewAdapter = new RecyclerViewAdapter();
     mPhotoViewAdapter.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        //mPresenter.startActivity();
         int position = mRecyclerView.getChildLayoutPosition(v);
-        PhotoModel model = mPhotoViewAdapter.getItem(position);
-        Toast.makeText(getApplicationContext(), model.getTitle(), Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(getApplicationContext(), ImageViewerActivity.class);
-        intent.putParcelableArrayListExtra(ImageViewerActivity.KEY_LIST, mPhotoViewAdapter.getList());
-        intent.putExtra(ImageViewerActivity.KEY_POSITION, position);
-        startActivity(intent);
+        mPresenter.clickPhotoListItem(position);
       }
     });
     mRecyclerView.setAdapter(mPhotoViewAdapter);
 
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl("http://demo2587971.mockable.io")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build();
-
-    APIService apiService  = retrofit.create(APIService.class);
-    Call<ImageModel> call = apiService.loadImage();
-
-    call.enqueue(new Callback<ImageModel>() {
-      @Override
-      public void onResponse(Call<ImageModel> call, Response<ImageModel> response) {
-       // Log.d(TAG, "result="+response.body().toString());
-        mPhotoViewAdapter.setList(response.body().getList());
-        mPhotoViewAdapter.notifyDataSetChanged();
-      }
-
-      @Override public void onFailure(Call<ImageModel> call, Throwable t) {
-        Log.d(TAG, "result="+t.toString());
-      }
-    });
-
-
+    mPresenter.start();
   }
 
  @Override protected void onStart() {
@@ -111,4 +79,25 @@ public class MainActivity extends AppCompatActivity {
     Log.d(TAG, "state = onDestroy");
   }
 
+  @Override public void setPresenter(ListImagesContract.Presenter presenter) {
+    mPresenter = presenter;
+  }
+
+  @Override public void showList(List<PhotoModel> list) {
+    mPhotoViewAdapter.setList(list);
+    mPhotoViewAdapter.notifyDataSetChanged();
+  }
+
+  @Override public void showListLoadError() {
+    Toast.makeText(this, "Photo list load error", Toast.LENGTH_SHORT).show();
+  }
+
+  @Override public void launchActivity(int position) {
+    PhotoModel model = mPhotoViewAdapter.getItem(position);
+    Toast.makeText(getApplicationContext(), model.getTitle(), Toast.LENGTH_SHORT).show();
+    Intent intent = new Intent(getApplicationContext(), ImageViewerActivity.class);
+    intent.putParcelableArrayListExtra(ImageViewerActivity.KEY_LIST, mPhotoViewAdapter.getList());
+    intent.putExtra(ImageViewerActivity.KEY_POSITION, position);
+    startActivity(intent);
+  }
 }
