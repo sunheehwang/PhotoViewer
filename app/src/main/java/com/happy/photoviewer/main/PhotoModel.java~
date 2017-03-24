@@ -1,0 +1,18 @@
+package com.happy.photoviewer.main;
+
+import android.os.Parcelable;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data @NoArgsConstructor @AllArgsConstructor @ToString public class PhotoModel implements Parcelable {
+  @SerializedName("title") private String title;Ω
+  @SerializedName("width") private int width;
+  @SerializedName("height") private int height;
+  @SerializedName("url") private String url;
+  @SerializedName("date_taken") private String dateTaken;
+}
