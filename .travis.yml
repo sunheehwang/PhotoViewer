@@ -10,15 +10,15 @@ cache:
                   - $HOME/.gradle/caches/
                      - $HOME/.gradle/wrapper/
 android:
+        licenses:
+                - 'android-sdk-preview-license-.+'
+                - 'android-sdk-license-.+'
+                - 'google-gdk-license-.+'
         components:
                 - tools
                 - platform-tools
                 - build-tools-25.0.2
                 - android-25
-        licenses:
-                - 'android-sdk-preview-license-.+'
-                - 'android-sdk-license-.+'
-                - 'google-gdk-license-.+'
 script:
         - ./gradlew build
 before_install:
