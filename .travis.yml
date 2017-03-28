@@ -1,10 +1,15 @@
 language: android
+jdk: oraclejdk8
 android:
         components:
                 - platform-tools
                 - build-tools-25.0.2
                 - android-25
-        script:
-                - ./gradlew build
-        before_install:
-                - chmod +x gradlew
+licenses:
+        - 'android-sdk-preview-license-.+'
+        - 'android-sdk-license-.+'
+        - 'google-gdk-license-.+'
+script:
+        - ./gradlew build
+before_install:
+        - chmod +x gradlew
