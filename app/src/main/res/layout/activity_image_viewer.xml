@@ -15,8 +15,8 @@
       android:layout_alignParentBottom="true"
       android:fillViewport="true"
       >
-    <com.happy.photoviewer.main.widget.CircleIndicatorView
-        android:id="@+id/veiw_indicator"
+    <com.happy.photoviewer.widget.CircleIndicatorView
+        android:id="@+id/view_indicator"
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         />
